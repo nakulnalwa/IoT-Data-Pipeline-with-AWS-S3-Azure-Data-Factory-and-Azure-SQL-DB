@@ -1,0 +1,75 @@
+ {
+    "name": "Ingestion_s3_to_ADLS",
+    "properties": {
+        "description": "Project1 Smart Vehicles",
+        "activities": [
+            {
+                "name": "Copy_JSON_S3_ADLS",
+                "description": "Copy S3 JSON to ADLS",
+                "type": "Copy",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "source": {
+                        "type": "JsonSource",
+                        "storeSettings": {
+                            "type": "AmazonS3ReadSettings",
+                            "recursive": true,
+                            "wildcardFileName": "*.json",
+                            "enablePartitionDiscovery": false
+                        },
+                        "formatSettings": {
+                            "type": "JsonReadSettings"
+                        }
+                    },
+                    "sink": {
+                        "type": "JsonSink",
+                        "storeSettings": {
+                            "type": "AzureBlobFSWriteSettings"
+                        },
+                        "formatSettings": {
+                            "type": "JsonWriteSettings"
+                        }
+                    },
+                    "enableStaging": false,
+                    "parallelCopies": 1,
+                    "dataIntegrationUnits": 2
+                },
+                "inputs": [
+                    {
+                        "referenceName": "s3_JSON_DS",
+                        "type": "DatasetReference",
+                        "parameters": {
+                            "folderPath": {
+                                "value": "@concat(formatDateTime(utcnow(),'yyyy'),'/',formatDateTime(utcnow(),'MM'),'/',formatDateTime(utcnow(),'dd'))",
+                                "type": "Expression"
+                            }
+                        }
+                    }
+                ],
+                "outputs": [
+                    {
+                        "referenceName": "Azyre_DL_DS",
+                        "type": "DatasetReference",
+                        "parameters": {
+                            "landingPath": {
+                                "value": "@concat('landing/',formatDateTime(utcnow(),'yyyy'),'/',formatDateTime(utcnow(),'MM'),'/',formatDateTime(utcnow(),'dd'))",
+                                "type": "Expression"
+                            }
+                        }
+                    }
+                ]
+            }
+        ],
+        "annotations": [],
+        "lastPublishTime": "2024-02-26T17:59:00Z"
+    },
+    "type": "Microsoft.DataFactory/factories/pipelines"
+}
